@@ -1,6 +1,8 @@
 import streamlit as st
-import json
-from datetime import datetime
-import pytz
 
-st.print("helloworld")
+def main():
+    st.title('Hello, World!')
+    st.write('This is a simple example of a Streamlit app.')
+
+if __name__ == '__main__':
+    main()
