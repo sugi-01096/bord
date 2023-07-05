@@ -37,7 +37,7 @@ def load_posts():
             post['timestamp'] = timestamp.strftime("%Y-%m-%d %H:%M:%S")
 
         return posts
-st.print("helloworld")
+
 def main():
     st.title("掲示板アプリ")
 
