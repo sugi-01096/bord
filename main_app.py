@@ -15,26 +15,30 @@ def check_post_content(content):
             content = content.replace(banned_word, "＠" * len(banned_word))
     return content
 
-def save_post(content):
+def save_post(content, page_id):
     now = datetime.now(pytz.timezone("Asia/Tokyo"))
     now_str = now.strftime("%Y-%m-%d %H:%M:%S")
     post = {"content": content, "timestamp": now_str}
-    with open('posts.json', 'a') as file:
+    with open(f'posts_{page_id}.json', 'a') as file:
         file.write(json.dumps(post))
         file.write('\n')
 
-def load_posts():
-    with open('posts.json', 'r') as file:
-        lines = file.readlines()
-        posts = [json.loads(line.strip()) for line in lines]
-        
-        # タイムスタンプを日本時間に変換
-        for post in posts:
-            timestamp = datetime.strptime(post['timestamp'], "%Y-%m-%d %H:%M:%S")
-            timestamp = pytz.timezone("Asia/Tokyo").localize(timestamp)
-            post['timestamp'] = timestamp.strftime("%Y-%m-%d %H:%M:%S")
 
-        return posts
+def load_posts(page_id):
+    try:
+        with open(f'posts_{page_id}.json', 'r') as file:
+            lines = file.readlines()
+            posts = [json.loads(line.strip()) for line in lines]
+        
+            # タイムスタンプを日本時間に変換
+            for post in posts:
+                timestamp = datetime.strptime(post['timestamp'], "%Y-%m-%d %H:%M:%S")
+                timestamp = pytz.timezone("Asia/Tokyo").localize(timestamp)
+                post['timestamp'] = timestamp.strftime("%Y-%m-%d %H:%M:%S")
+
+            return posts
+    except FileNotFoundError:
+        return []
 
 def main():
     st.title("test")
