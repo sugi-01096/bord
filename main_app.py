@@ -40,6 +40,7 @@ def load_posts(page_id):
     except FileNotFoundError:
         return []
 
+
 def main():
     st.title("test")
 
