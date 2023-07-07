@@ -23,13 +23,13 @@ class Thread:
         if post.author == current_user.username:
             post.content = new_content
         else:
-            st.error("You are not authorized to edit this post.")
+            st.error("この投稿を編集する権限がありません。")
 
     def delete_post(self, post):
         if post.author == current_user.username:
             self.posts.remove(post)
         else:
-            st.error("You are not authorized to delete this post.")
+            st.error("この投稿を削除する権限がありません。")
 
     def display_thread(self, posts=None, indent=0):
         if posts is None:
@@ -44,31 +44,52 @@ class Thread:
 thread = Thread()
 
 # 仮想のユーザーデータベース
-user_db = [
-    User("user1", "password1"),
-    User("user2", "password2"),
-    User("user3", "password3")
-]
+user_db = []
 
 # Streamlitアプリのレイアウトとインタラクションの作成
 def main():
-    st.title("Threaded Bulletin Board")
-    login()
+    st.title("スレッド型掲示板")
+    login_or_register()
+
+def login_or_register():
+    st.subheader("ログインまたは新規登録")
+    login_or_register_choice = st.radio("選択してください:", ("ログイン", "新規登録"))
+
+    if login_or_register_choice == "ログイン":
+        login()
+    else:
+        register()
 
 def login():
-    st.subheader("Login")
-    username = st.text_input("Username")
-    password = st.text_input("Password", type="password")
+    st.subheader("ログイン")
+    username = st.text_input("ユーザー名")
+    password = st.text_input("パスワード", type="password")
 
-    if st.button("Login"):
+    if st.button("ログイン"):
         user = authenticate(username, password)
         if user:
-            st.success(f"Logged in as {user.username}")
+            st.success(f"{user.username}としてログインしました")
             global current_user
             current_user = user
             display_posts(thread.posts)
         else:
-            st.error("Invalid username or password.")
+            st.error("無効なユーザー名またはパスワードです。")
+
+def register():
+    st.subheader("新規登録")
+    new_username = st.text_input("新しいユーザー名")
+    new_password = st.text_input("新しいパスワード", type="password")
+
+    if st.button("新規登録"):
+        if not new_username or not new_password:
+            st.error("ユーザー名とパスワードは空にできません。")
+        elif user_exists(new_username):
+            st.error("ユーザー名は既に存在します。")
+        else:
+            new_user = User(new_username, new_password)
+            user_db.append(new_user)
+            st.success("登録が成功しました。ログインしてください。")
+            login()
 
 def authenticate(username, password):
     for user in user_db:
@@ -76,12 +97,18 @@ def authenticate(username, password):
             return user
     return None
 
+def user_exists(username):
+    for user in user_db:
+        if user.username == username:
+            return True
+    return False
+
 def display_posts(posts):
     for post in posts:
-        st.write(f"Author: {post.author}")
+        st.write(f"投稿者: {post.author}")
         st.write(post.content)
         if post.parent:
-            st.write("Reply to:")
+            st.write("返信先:")
             display_posts([p for p in thread.posts if p.parent == post])
         st.write("---")
 
