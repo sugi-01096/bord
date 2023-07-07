@@ -67,7 +67,7 @@ def login():
 
     if st.button("ログイン"):
         user = authenticate(username, password)
-        if user:
+        if user is not None:
             st.success(f"{user.username}としてログインしました")
             global current_user
             current_user = user
