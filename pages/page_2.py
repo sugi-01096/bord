@@ -3,9 +3,6 @@ import json
 from datetime import datetime
 import pytz
 import urllib.parse
-import firebase_admin
-from firebase_admin import credentials
-from firebase_admin import auth
 
 # 禁止ワードのリスト
 banned_words = ["馬鹿", "禁止ワード2", "禁止ワード3"]
@@ -17,18 +14,6 @@ def check_post_content(content):
         if banned_word in content:
             content = content.replace(banned_word, "＠" * len(banned_word))
     return content
-
-cred = credentials.Certificate("path/to/serviceAccountKey.json")
-firebase_admin.initialize_app(cred)
-
-def main():
-    # Firebase Authenticationでの認証
-    user = st.firebase_auth(credentials.Certificate("path/to/serviceAccountKey.json"))
-    if user:
-        st.success("ログイン成功！")
-        # ログイン成功時にのみ投稿の表示や投稿の保存などを行うコードを実行する
-    else:
-        st.error("ログイン情報が正しくありません。")
 
 def save_post(content):
     now = datetime.now(pytz.timezone("Asia/Tokyo"))
