@@ -49,7 +49,14 @@ user_db = []
 # Streamlitアプリのレイアウトとインタラクションの作成
 def main():
     st.title("スレッド型掲示板")
-    login_or_register()
+    if current_user is None:
+        login_or_register()
+    else:
+        post_content = st.text_area("投稿内容")
+        if st.button("投稿"):
+            thread.add_post(post_content, current_user.username)
+            st.success("投稿が成功しました。")
+            display_posts(thread.posts)
 
 def login_or_register():
     st.subheader("ログインまたは新規登録")
@@ -89,7 +96,6 @@ def register():
             new_user = User(new_username, new_password)
             user_db.append(new_user)
             st.success("登録が成功しました。")
-            # 新規登録後に自動的にログインする
             login_with_new_user(new_user)
 
 def login_with_new_user(user):
@@ -118,6 +124,8 @@ def display_posts(posts):
             st.write("返信先:")
             display_posts([p for p in thread.posts if p.parent == post])
         st.write("---")
+
+current_user = None
 
 if __name__ == "__main__":
     main()
