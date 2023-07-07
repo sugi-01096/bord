@@ -88,8 +88,15 @@ def register():
         else:
             new_user = User(new_username, new_password)
             user_db.append(new_user)
-            st.success("登録が成功しました。ログインしてください。")
-            login()
+            st.success("登録が成功しました。")
+            # 新規登録後に自動的にログインする
+            login_with_new_user(new_user)
+
+def login_with_new_user(user):
+    global current_user
+    current_user = user
+    st.success(f"{user.username}としてログインしました")
+    display_posts(thread.posts)
 
 def authenticate(username, password):
     for user in user_db:
