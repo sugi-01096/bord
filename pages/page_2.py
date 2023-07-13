@@ -15,10 +15,10 @@ def check_post_content(content):
             content = content.replace(banned_word, "＠" * len(banned_word))
     return content
 
-def save_post(content):
+def save_post(content, good_count=0, bad_count=0):
     now = datetime.now(pytz.timezone("Asia/Tokyo"))
     now_str = now.strftime("%Y-%m-%d %H:%M:%S")
-    post = {"content": content, "timestamp": now_str, "good": 0, "bad": 0}
+    post = {"content": content, "timestamp": now_str, "good": good_count, "bad": bad_count}
     with open('posts.json', 'a') as file:
         file.write(json.dumps(post))
         file.write('\n')
@@ -47,9 +47,9 @@ def main():
         new_post_content = check_post_content(new_post_content)
         if "＠" in new_post_content:
             st.warning("禁止ワードが含まれています！")
-        else:
-            save_post(new_post_content)
-            st.success("投稿が保存されました！")
+
+        save_post(new_post_content)
+        st.success("投稿が保存されました！")
 
     # 保存された投稿の表示
     posts = load_posts()
@@ -58,9 +58,31 @@ def main():
     if not posts:
         st.info("まだ投稿がありません。")
     else:
-        for post in posts:
-            st.subheader(post['content'])
+        for i, post in enumerate(posts):
+            st.subheader(f"投稿{i + 1}")
+            st.write(post['content'])  # 投稿内容を表示
             st.write(post['timestamp'])  # タイムスタンプを表示
+            
+            # GoodとBadのカウントを表示
+            col1, col2 = st.beta_columns(2)
+            with col1:
+                good_count = st.button(f"Good ({post['good']})")
+            with col2:
+                bad_count = st.button(f"Bad ({post['bad']})")
+            
+            # GoodとBadのカウントを更新
+            if good_count:
+                posts[i]['good'] += 1
+            if bad_count:
+                posts[i]['bad'] += 1
+            
+            st.markdown("---")
 
-            # コメントボタンの表示
-            col1, col2 =
+    # 投稿の更新を保存
+    with open('posts.json', 'w') as file:
+        for post in posts:
+            file.write(json.dumps(post))
+            file.write('\n')
+
+if __name__ == "__main__":
+    main()
