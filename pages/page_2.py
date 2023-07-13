@@ -15,10 +15,10 @@ def check_post_content(content):
             content = content.replace(banned_word, "＠" * len(banned_word))
     return content
 
-def save_post(content, comments=[]):
+def save_post(content, good_count=0, bad_count=0):
     now = datetime.now(pytz.timezone("Asia/Tokyo"))
     now_str = now.strftime("%Y-%m-%d %H:%M:%S")
-    post = {"content": content, "timestamp": now_str, "comments": comments}
+    post = {"content": content, "timestamp": now_str, "good": good_count, "bad": bad_count}
     with open('posts.json', 'a') as file:
         file.write(json.dumps(post))
         file.write('\n')
@@ -63,16 +63,18 @@ def main():
             st.write(post['content'])  # 投稿内容を表示
             st.write(post['timestamp'])  # タイムスタンプを表示
             
-            # コメントの表示と評価
-            comments = post.get('comments', [])
-            for comment in comments:
-                st.write(f"- {comment}")
+            # GoodとBadのカウントを表示
+            col1, col2 = st.beta_columns(2)
+            with col1:
+                good_count = st.button(f"Good ({post['good']})")
+            with col2:
+                bad_count = st.button(f"Bad ({post['bad']})")
             
-            # コメントの入力フィールドと投稿ボタン
-            new_comment = st.text_input("コメントを追加")
-            if st.button("コメントする") and new_comment:
-                comments.append(new_comment)
-                posts[i]['comments'] = comments
+            # GoodとBadのカウントを更新
+            if good_count:
+                posts[i]['good'] += 1
+            if bad_count:
+                posts[i]['bad'] += 1
             
             st.markdown("---")
 
