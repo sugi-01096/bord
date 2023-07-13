@@ -1,131 +1,66 @@
 import streamlit as st
+import json
+from datetime import datetime
+import pytz
+import urllib.parse
 
-class User:
-    def __init__(self, username, password):
-        self.username = username
-        self.password = password
+# 禁止ワードのリスト
+banned_words = ["馬鹿", "禁止ワード2", "禁止ワード3"]
 
-class Post:
-    def __init__(self, content, author, parent=None):
-        self.content = content
-        self.author = author
-        self.parent = parent
+# ユーザーの投稿内容をチェックする関数
+def check_post_content(content):
+    # タイトルと投稿内容の禁止ワードの検出
+    for banned_word in banned_words:
+        if banned_word in content:
+            content = content.replace(banned_word, "＠" * len(banned_word))
+    return content
 
-class Thread:
-    def __init__(self):
-        self.posts = []
+def save_post(content):
+    now = datetime.now(pytz.timezone("Asia/Tokyo"))
+    now_str = now.strftime("%Y-%m-%d %H:%M:%S")
+    post = {"content": content, "timestamp": now_str, "good": 0, "bad": 0}
+    with open('posts.json', 'a') as file:
+        file.write(json.dumps(post))
+        file.write('\n')
 
-    def add_post(self, content, author, parent=None):
-        post = Post(content, author, parent)
-        self.posts.append(post)
-
-    def edit_post(self, post, new_content):
-        if post.author == current_user.username:
-            post.content = new_content
-        else:
-            st.error("この投稿を編集する権限がありません。")
-
-    def delete_post(self, post):
-        if post.author == current_user.username:
-            self.posts.remove(post)
-        else:
-            st.error("この投稿を削除する権限がありません。")
-
-    def display_thread(self, posts=None, indent=0):
-        if posts is None:
-            posts = self.posts
-
+def load_posts():
+    with open('posts.json', 'r') as file:
+        lines = file.readlines()
+        posts = [json.loads(line.strip()) for line in lines]
+        
+        # タイムスタンプを日本時間に変換
         for post in posts:
-            st.write(("  " * indent) + post.content)
-            if post.parent:
-                self.display_thread([p for p in self.posts if p.parent == post], indent + 1)
+            timestamp = datetime.strptime(post['timestamp'], "%Y-%m-%d %H:%M:%S")
+            timestamp = pytz.timezone("Asia/Tokyo").localize(timestamp)
+            post['timestamp'] = timestamp.strftime("%Y-%m-%d %H:%M:%S")
 
-# 電子掲示板の作成と使用例
-thread = Thread()
+        return posts
 
-# 仮想のユーザーデータベース
-user_db = []
-
-# Streamlitアプリのレイアウトとインタラクションの作成
 def main():
-    st.title("スレッド型掲示板")
-    if current_user is None:
-        login_or_register()
-    else:
-        post_content = st.text_area("投稿内容")
-        if st.button("投稿"):
-            thread.add_post(post_content, current_user.username)
-            st.success("投稿が成功しました。")
-            display_posts(thread.posts)
+    st.title("テスト")
 
-def login_or_register():
-    st.subheader("ログインまたは新規登録")
-    login_or_register_choice = st.radio("選択してください:", ("ログイン", "新規登録"))
+    # 新規投稿の入力
+    new_post_content = st.text_area("投稿", height=100)
 
-    if login_or_register_choice == "ログイン":
-        login()
-    else:
-        register()
-
-def login():
-    st.subheader("ログイン")
-    username = st.text_input("ユーザー名")
-    password = st.text_input("パスワード", type="password")
-
-    if st.button("ログイン"):
-        user = authenticate(username, password)
-        if user is not None:
-            st.success(f"{user.username}としてログインしました")
-            global current_user
-            current_user = user
-            display_posts(thread.posts)
+    # 投稿ボタンが押された場合
+    if st.button("投稿する") and new_post_content:
+        new_post_content = check_post_content(new_post_content)
+        if "＠" in new_post_content:
+            st.warning("禁止ワードが含まれています！")
         else:
-            st.error("無効なユーザー名またはパスワードです。")
+            save_post(new_post_content)
+            st.success("投稿が保存されました！")
 
-def register():
-    st.subheader("新規登録")
-    new_username = st.text_input("新しいユーザー名")
-    new_password = st.text_input("新しいパスワード", type="password")
+    # 保存された投稿の表示
+    posts = load_posts()
+    st.subheader("保存された投稿")
 
-    if st.button("新規登録"):
-        if not new_username or not new_password:
-            st.error("ユーザー名とパスワードは空にできません。")
-        elif user_exists(new_username):
-            st.error("ユーザー名は既に存在します。")
-        else:
-            new_user = User(new_username, new_password)
-            user_db.append(new_user)
-            st.success("登録が成功しました。")
-            login_with_new_user(new_user)
+    if not posts:
+        st.info("まだ投稿がありません。")
+    else:
+        for post in posts:
+            st.subheader(post['content'])
+            st.write(post['timestamp'])  # タイムスタンプを表示
 
-def login_with_new_user(user):
-    global current_user
-    current_user = user
-    st.success(f"{user.username}としてログインしました")
-    display_posts(thread.posts)
-
-def authenticate(username, password):
-    for user in user_db:
-        if user.username == username and user.password == password:
-            return user
-    return None
-
-def user_exists(username):
-    for user in user_db:
-        if user.username == username:
-            return True
-    return False
-
-def display_posts(posts):
-    for post in posts:
-        st.write(f"投稿者: {post.author}")
-        st.write(post.content)
-        if post.parent:
-            st.write("返信先:")
-            display_posts([p for p in thread.posts if p.parent == post])
-        st.write("---")
-
-current_user = None
-
-if __name__ == "__main__":
-    main()
+            # コメントボタンの表示
+            col1, col2 =
