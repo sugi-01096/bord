@@ -3,7 +3,7 @@ import json
 from datetime import datetime
 import pytz
 import urllib.parse
-
+#2つ目のページ
 # 禁止ワードのリスト
 banned_words = ["馬鹿", "禁止ワード2", "禁止ワード3"]
 
