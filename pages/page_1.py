@@ -19,12 +19,12 @@ def save_post(content):
     now = datetime.now(pytz.timezone("Asia/Tokyo"))
     now_str = now.strftime("%Y-%m-%d %H:%M:%S")
     post = {"content": content, "timestamp": now_str}
-    with open('posts.json', 'a') as file:
+    with open('posts１.json', 'a') as file:
         file.write(json.dumps(post))
         file.write('\n')
 
 def load_posts():
-    with open('posts.json', 'r') as file:
+    with open('posts１.json', 'r') as file:
         lines = file.readlines()
         posts = [json.loads(line.strip()) for line in lines]
         
