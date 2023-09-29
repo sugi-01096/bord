@@ -1,7 +1,12 @@
 import streamlit as st
-import json
-from datetime import datetime
-import pytz
-import urllib.parse
-post_url = f"<a href='https://maichan-bord-tui.streamlit.app'>{post['main']}</a>"
-print(post_url)
+
+def main():
+    st.title("外部URLへのリンク")
+
+    # ボタンをクリックして外部URLに飛ぶ
+    if st.button("外部URLにアクセス"):
+        external_url = "https://maichan-bord-tui.streamlit.app/"
+        st.markdown(f"[外部URLにアクセスする]({external_url})")
+
+if __name__ == "__main__":
+    main()
