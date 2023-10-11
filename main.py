@@ -6,4 +6,4 @@ import urllib.parse
 
 st.title("雑談")
 
-st.print("ここは雑談ページです")
+st.write("ここは雑談ページです")
