@@ -1,12 +1,12 @@
 import streamlit as st
 
 def main():
-    st.title("外部URLへのリダイレクト")
+    st.title("外部URLへのリンク")
 
-    external_url = "https://maichan-bord-tui.streamlit.app/"
-
-    # JavaScriptを使用して外部URLにリダイレクト
-    st.write(f'<script>window.location.href = "{external_url}";</script>', unsafe_allow_html=True)
+    # ボタンをクリックして外部URLに飛ぶ
+    if st.button("外部URLにアクセス"):
+        external_url = "https://maichan-bord-tui.streamlit.app/"
+        st.markdown(f"[外部URLにアクセスする]({external_url})")
 
 if __name__ == "__main__":
     main()
