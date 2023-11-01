@@ -3,6 +3,7 @@ import json
 from datetime import datetime
 import pytz
 import urllib.parse
+import pandas as pd
 
 # 禁止ワードをExcelファイルから読み込む・
 df = pd.read_excel("banned_list.xlsx", sheet_name=0)
