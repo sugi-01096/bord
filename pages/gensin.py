@@ -18,4 +18,4 @@ def check_post_content(content):
             content = content.replace(banned_word, "＠" * len(banned_word))
     return content
 
-# 以降のコードは変更なし
+
