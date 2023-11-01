@@ -4,13 +4,11 @@ from datetime import datetime
 import pytz
 import urllib.parse
 
-# 禁止ワードのリストをファイルから読み込む
-def load_banned_words(filename):
-    with open(filename, 'r', encoding='utf-8') as file:
-        return [line.strip() for line in file]
-
-# toxic.txtから禁止ワードリストを読み込む
-banned_words = load_banned_words("toxic.txt")
+# 禁止ワードをExcelファイルから読み込む
+df = pd.read_excel("banned_list.xlsx", sheet_name=0)
+#禁止ワードをbanned_words に
+banned_words = df['禁止ワード'].tolist()
+banned_words = [str(word) for word in banned_words]
 
 # ユーザーの投稿内容をチェックする関数
 def check_post_content(content):
