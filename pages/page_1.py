@@ -5,11 +5,11 @@ from datetime import datetime
 import pytz
 import urllib.parse
 
-# 禁止ワードのリスト
-# Excelファイルから読み込む
-def load_banned_words():
-    df = pd.read_excel("禁止ワード.xlsx")
-    return df['禁止用語'].tolist()
+# 禁止ワードをExcelファイルから読み込む
+df = pd.read_excel("banned_list.xlsx", sheet_name=0)
+#禁止ワードをbanned_words に
+banned_words = df['禁止ワード'].tolist()
+banned_words = [str(word) for word in banned_words]
 
 banned_words = load_banned_words()
 
