@@ -4,7 +4,7 @@ from datetime import datetime
 import pytz
 import urllib.parse
 
-# 禁止ワードをExcelファイルから読み込む
+# 禁止ワードをExcelファイルから読み込む・
 df = pd.read_excel("banned_list.xlsx", sheet_name=0)
 #禁止ワードをbanned_words に
 banned_words = df['禁止ワード'].tolist()
