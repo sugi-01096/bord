@@ -6,7 +6,7 @@ import urllib.parse
 import pandas as pd
 
 # 禁止ワードをExcelファイルから読み込む
-df = pd.read_excel("banned_word.xlsx", sheet_name=0)
+df = pd.read_excel("banned_list.xlsx", sheet_name=0)
 #禁止ワードをbanned_words に
 banned_words = df['禁止ワード'].tolist()
 banned_words = [str(word) for word in banned_words]
