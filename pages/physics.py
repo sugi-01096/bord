@@ -5,7 +5,7 @@ import pytz
 import urllib.parse
 
 # 禁止ワードのリスト
-banned_words = ["馬鹿", "禁止ワード2", "禁止ワード3"]
+banned_list = ["馬鹿", "禁止ワード2", "禁止ワード3"]
 
 # ユーザーの投稿内容をチェックする関数
 def check_post_content(content):
