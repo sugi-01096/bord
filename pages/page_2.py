@@ -11,7 +11,7 @@ def check_post_content(content):
     # タイトルと投稿内容の禁止ワードの検出
     
 
-def save_post(content, image):
+　　def save_post(content, image):
     now = datetime.now(pytz.timezone("Asia/Tokyo"))
     now_str = now.strftime("%Y-%m-%d %H:%M:%S")
     post = {"content": content, "timestamp": now_str, "image": image}
