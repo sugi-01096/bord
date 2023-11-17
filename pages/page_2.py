@@ -3,33 +3,24 @@ import json
 from datetime import datetime
 import pytz
 import urllib.parse
+import pandas as pd
 
-#2つ目のページ
-
-# 禁止ワードをExcelファイルから読み込む
-df = pd.read_excel("banned_list.xlsx", sheet_name=0)
-#禁止ワードをbanned_words に
-banned_words = df['禁止ワード'].tolist()
-banned_words = [str(word) for word in banned_words]
 
 # ユーザーの投稿内容をチェックする関数
 def check_post_content(content):
     # タイトルと投稿内容の禁止ワードの検出
-    for banned_word in banned_words:
-        if banned_word in content:
-            content = content.replace(banned_word, "＠" * len(banned_word))
-    return content
+    
 
-def save_post(content):
+def save_post(content, image):
     now = datetime.now(pytz.timezone("Asia/Tokyo"))
     now_str = now.strftime("%Y-%m-%d %H:%M:%S")
-    post = {"content": content, "timestamp": now_str}
-    with open('posts2.json', 'a') as file:
+    post = {"content": content, "timestamp": now_str, "image": image}
+    with open('posts1.json', 'a') as file:
         file.write(json.dumps(post))
         file.write('\n')
 
 def load_posts():
-    with open('posts2.json', 'r') as file:
+    with open('posts1.json', 'r') as file:
         lines = file.readlines()
         posts = [json.loads(line.strip()) for line in lines]
         
@@ -42,19 +33,26 @@ def load_posts():
         return posts
 
 def main():
-    st.title("test")
+    st.title("雑談１")
 
     # 新規投稿の入力
     new_post_content = st.text_area("投稿", height=100)
 
-    
+    # 画像のアップロード
+    uploaded_image = st.file_uploader("画像をアップロード", type=["jpg", "jpeg", "png"])
+
     # 投稿ボタンが押された場合
     if st.button("投稿する") and new_post_content:
         new_post_content = check_post_content(new_post_content)
         if "＠" in new_post_content:
             st.warning("禁止ワードが含まれています！")
 
-        save_post(new_post_content)
+        # 画像がアップロードされた場合、バイナリデータとして保存
+        image_data = None
+        if uploaded_image is not None:
+            image_data = uploaded_image.read()
+
+        save_post(new_post_content, image_data)
         st.success("投稿が保存されました！")
 
     # 保存された投稿の表示
@@ -66,6 +64,7 @@ def main():
     else:
         for post in posts:
             st.subheader(post['content'])
+            st.image(post['image']) if 'image' in post else None
             st.write(post['timestamp'])  # タイムスタンプを表示
             st.markdown("---")
 
