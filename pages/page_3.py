@@ -3,6 +3,8 @@ import json
 from datetime import datetime
 import pytz
 import urllib.parse
+import pandas as pd
+
 #3つ目のページ
 
 # 禁止ワードをExcelファイルから読み込む
