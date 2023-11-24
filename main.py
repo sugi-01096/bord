@@ -3,6 +3,7 @@ import json
 from datetime import datetime
 import pytz
 import urllib.parse
+import pandas as pd
 
 # 禁止ワードのリスト
 banned_words = ["banned_list.xlsx", sheet_name = 0]
