@@ -41,7 +41,7 @@ def load_posts():
         return posts
 
 def main():
-    st.title("テスト")
+    st.title("恋バナ")
 
     # 新規投稿の入力
     new_post_content = st.text_area("投稿", height=100)
