@@ -15,7 +15,6 @@ df = pd.read_excel("banned_list.xlsx", sheet_name=0)
 banned_words = df['禁止ワード'].tolist()
 banned_words = [str(word) for word in banned_words]
 
-
 def check_post_content(content):
     for banned_word in banned_words:
         if banned_word in content:
