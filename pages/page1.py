@@ -40,7 +40,14 @@ def load_posts():
             timestamp = pytz.timezone("Asia/Tokyo").localize(timestamp)
             post['timestamp'] = timestamp.strftime("%Y-%m-%d %H:%M:%S")
 
+            # Check if 'likes' and 'dislikes' exist, initialize if missing
+            if 'likes' not in post:
+                post['likes'] = 0
+            if 'dislikes' not in post:
+                post['dislikes'] = 0
+
         return posts
+
 
 def main():
     st.title("雑談１")
