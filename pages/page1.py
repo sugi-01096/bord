@@ -1,54 +1,3 @@
-import streamlit as st
-import json
-import base64
-from datetime import datetime
-import pytz
-import pandas as pd
-
-# 禁止ワードをExcelファイルから読み込む
-df = pd.read_excel("banned_list.xlsx", sheet_name=0)
-banned_words = df['禁止ワード'].tolist()
-banned_words = [str(word) for word in banned_words]
-
-def check_post_content(content):
-    for banned_word in banned_words:
-        if banned_word in content:
-            content = content.replace(banned_word, "＠" * len(banned_word))
-    return content
-
-def save_post(content, image):
-    now = datetime.now(pytz.timezone("Asia/Tokyo"))
-    now_str = now.strftime("%Y-%m-%d %H:%M:%S")
-
-    image_data = None
-    if image:
-        image_data = base64.b64encode(image).decode('utf-8')
-
-    # 初期いいねとバッドの数は0
-    post = {"content": content, "image": image_data, "timestamp": now_str, "likes": 0, "dislikes": 0}
-    with open('posts1.json', 'a') as file:
-        file.write(json.dumps(post))
-        file.write('\n')
-
-def load_posts():
-    with open('posts1.json', 'r') as file:
-        lines = file.readlines()
-        posts = [json.loads(line.strip()) for line in lines]
-
-        for post in posts:
-            timestamp = datetime.strptime(post['timestamp'], "%Y-%m-%d %H:%M:%S")
-            timestamp = pytz.timezone("Asia/Tokyo").localize(timestamp)
-            post['timestamp'] = timestamp.strftime("%Y-%m-%d %H:%M:%S")
-
-            # Check if 'likes' and 'dislikes' exist, initialize if missing
-            if 'likes' not in post:
-                post['likes'] = 0
-            if 'dislikes' not in post:
-                post['dislikes'] = 0
-
-        return posts
-
-
 def main():
     st.title("雑談１")
 
@@ -75,7 +24,7 @@ def main():
     else:
         for post in posts:
             st.subheader(post['content'])
-            
+
             # 画像があれば表示
             if 'image' in post and post['image'] is not None:
                 st.image(base64.b64decode(post['image']), caption="Uploaded Image", use_column_width=True)
@@ -83,8 +32,14 @@ def main():
             st.write(post['timestamp'])
 
             # いいねとバッドのボタン
-            likes = st.button(f"👍 いいね {post['likes']}", key=f"like_{post['timestamp']}")
-            dislikes = st.button(f"👎 バッド {post['dislikes']}", key=f"dislike_{post['timestamp']}")
+            likes = st.button(f"👍 いいね {post.get('likes', 0)}", key=f"like_{post['timestamp']}")
+            dislikes = st.button(f"👎 バッド {post.get('dislikes', 0)}", key=f"dislike_{post['timestamp']}")
+
+            # Ensure 'likes' and 'dislikes' fields exist in the post
+            if 'likes' not in post:
+                post['likes'] = 0
+            if 'dislikes' not in post:
+                post['dislikes'] = 0
 
             if likes:
                 post['likes'] += 1
