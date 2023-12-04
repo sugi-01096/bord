@@ -5,6 +5,49 @@ from datetime import datetime
 import pytz
 import pandas as pd
 
+df = pd.read_excel("banned_list.xlsx", sheet_name=0)
+banned_words = df['禁止ワード'].tolist()
+banned_words = [str(word) for word in banned_words]
+
+def check_post_content(content):
+    for banned_word in banned_words:
+        if banned_word in content:
+            content = content.replace(banned_word, "＠" * len(banned_word))
+    return content
+
+def save_post(content, image):
+    now = datetime.now(pytz.timezone("Asia/Tokyo"))
+    now_str = now.strftime("%Y-%m-%d %H:%M:%S")
+
+    image_data = None
+    if image:
+        image_data = base64.b64encode(image).decode('utf-8')
+
+    # 初期いいねとバッドの数は0
+    post = {"content": content, "image": image_data, "timestamp": now_str, "likes": 0, "dislikes": 0}
+    with open('posts1.json', 'a') as file:
+        file.write(json.dumps(post))
+        file.write('\n')
+
+def load_posts():
+    with open('posts1.json', 'r') as file:
+        lines = file.readlines()
+        posts = [json.loads(line.strip()) for line in lines]
+
+        for post in posts:
+            timestamp = datetime.strptime(post['timestamp'], "%Y-%m-%d %H:%M:%S")
+            timestamp = pytz.timezone("Asia/Tokyo").localize(timestamp)
+            post['timestamp'] = timestamp.strftime("%Y-%m-%d %H:%M:%S")
+
+            # Check if 'likes' and 'dislikes' exist, initialize if missing
+            if 'likes' not in post:
+                post['likes'] = 0
+            if 'dislikes' not in post:
+                post['dislikes'] = 0
+
+        return posts
+
+    
 def main():
     st.title("雑談１")
 
