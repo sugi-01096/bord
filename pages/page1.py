@@ -66,6 +66,7 @@ def main():
         save_post(new_post_content, image_data)
         st.success("投稿が保存されました！")
 
+    
     posts = load_posts()
     st.subheader("保存された投稿")
 
@@ -91,12 +92,19 @@ def main():
             if 'dislikes' not in post:
                 post['dislikes'] = 0
 
+            # Update likes and dislikes counts in the post
             if likes:
                 post['likes'] += 1
             if dislikes:
                 post['dislikes'] += 1
 
-            st.markdown("---")
+        st.markdown("---")
+
+        # Updated postsをファイルに保存
+        with open('posts1.json', 'w') as file:
+            for p in posts:
+                file.write(json.dumps(p))
+                file.write('\n')
 
 if __name__ == "__main__":
     main()
