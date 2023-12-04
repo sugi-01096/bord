@@ -1,3 +1,10 @@
+import streamlit as st
+import json
+import base64
+from datetime import datetime
+import pytz
+import pandas as pd
+
 def main():
     st.title("雑談１")
 
