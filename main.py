@@ -2,7 +2,6 @@ import streamlit as st
 import json
 from datetime import datetime
 import pytz
-import urllib.parse
 import pandas as pd
 
 # 禁止ワードをExcelファイルから読み込む
@@ -19,16 +18,16 @@ def check_post_content(content):
             content = content.replace(banned_word, "＠" * len(banned_word))
     return content
 
-def save_post(content):
+def save_post(content, image):
     now = datetime.now(pytz.timezone("Asia/Tokyo"))
     now_str = now.strftime("%Y-%m-%d %H:%M:%S")
-    post = {"content": content, "timestamp": now_str}
-    with open('posts.json', 'a') as file:
+    post = {"content": content, "image": image, "timestamp": now_str}
+    with open('posts1.json', 'a') as file:
         file.write(json.dumps(post))
         file.write('\n')
 
 def load_posts():
-    with open('posts.json', 'r') as file:
+    with open('posts1.json', 'r') as file:
         lines = file.readlines()
         posts = [json.loads(line.strip()) for line in lines]
         
@@ -41,19 +40,24 @@ def load_posts():
         return posts
 
 def main():
-    st.title("テスト")
+    st.title("雑談１")
 
     # 新規投稿の入力
     new_post_content = st.text_area("投稿", height=100)
+    new_post_image = st.file_uploader("画像をアップロード", type=["jpg", "jpeg", "png"])
 
-    
     # 投稿ボタンが押された場合
     if st.button("投稿する") and new_post_content:
         new_post_content = check_post_content(new_post_content)
         if "＠" in new_post_content:
             st.warning("禁止ワードが含まれています！")
 
-        save_post(new_post_content)
+        # 画像がアップロードされていれば、バイナリデータに変換して保存
+        image_data = None
+        if new_post_image:
+            image_data = new_post_image.read()
+
+        save_post(new_post_content, image_data)
         st.success("投稿が保存されました！")
 
     # 保存された投稿の表示
@@ -65,6 +69,9 @@ def main():
     else:
         for post in posts:
             st.subheader(post['content'])
+            # 画像があれば表示
+            if 'image' in post and post['image'] is not None:
+                st.image(post['image'], caption="Uploaded Image", use_column_width=True)
             st.write(post['timestamp'])  # タイムスタンプを表示
             st.markdown("---")
 
