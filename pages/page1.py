@@ -83,8 +83,8 @@ def main():
             st.write(post['timestamp'])
 
             # いいねとバッドのボタン
-            likes = st.button(f"👍 いいね {post.get('likes', 0)}", key=f"like_{post['timestamp']}")
-            dislikes = st.button(f"👎 バッド {post.get('dislikes', 0)}", key=f"dislike_{post['timestamp']}")
+            likes = st.button(f"👍  {post.get('likes', 0)}", key=f"like_{post['timestamp']}")
+            dislikes = st.button(f"👎  {post.get('dislikes', 0)}", key=f"dislike_{post['timestamp']}")
 
             # Ensure 'likes' and 'dislikes' fields exist in the post
             if 'likes' not in post:
