@@ -4,6 +4,10 @@ import base64
 from datetime import datetime
 import pytz
 import pandas as pd
+ 
+def initialize_session_state():
+    if 'posts' not in st.session_state:
+        st.session_state.posts = []
 
 df = pd.read_excel("banned_list.xlsx", sheet_name=0)
 banned_words = df['禁止ワード'].tolist()
