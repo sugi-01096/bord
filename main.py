@@ -1,12 +1,13 @@
 import streamlit as st
 import json
+import base64  # 追加
 from datetime import datetime
 import pytz
 import pandas as pd
 
 # 禁止ワードをExcelファイルから読み込む
 df = pd.read_excel("banned_list.xlsx", sheet_name=0)
-#禁止ワードをbanned_words に
+# 禁止ワードをbanned_words に
 banned_words = df['禁止ワード'].tolist()
 banned_words = [str(word) for word in banned_words]
 
@@ -21,7 +22,13 @@ def check_post_content(content):
 def save_post(content, image):
     now = datetime.now(pytz.timezone("Asia/Tokyo"))
     now_str = now.strftime("%Y-%m-%d %H:%M:%S")
-    post = {"content": content, "image": image, "timestamp": now_str}
+
+    # 画像データをBase64にエンコード
+    image_data = None
+    if image:
+        image_data = base64.b64encode(image).decode('utf-8')
+
+    post = {"content": content, "image": image_data, "timestamp": now_str}
     with open('posts1.json', 'a') as file:
         file.write(json.dumps(post))
         file.write('\n')
@@ -30,7 +37,7 @@ def load_posts():
     with open('posts1.json', 'r') as file:
         lines = file.readlines()
         posts = [json.loads(line.strip()) for line in lines]
-        
+
         # タイムスタンプを日本時間に変換
         for post in posts:
             timestamp = datetime.strptime(post['timestamp'], "%Y-%m-%d %H:%M:%S")
@@ -71,7 +78,7 @@ def main():
             st.subheader(post['content'])
             # 画像があれば表示
             if 'image' in post and post['image'] is not None:
-                st.image(post['image'], caption="Uploaded Image", use_column_width=True)
+                st.image(base64.b64decode(post['image']), caption="Uploaded Image", use_column_width=True)
             st.write(post['timestamp'])  # タイムスタンプを表示
             st.markdown("---")
 
