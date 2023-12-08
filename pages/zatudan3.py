@@ -29,7 +29,7 @@ def save_post(content, image):
         image_data = base64.b64encode(image).decode('utf-8')
 
     post = {"content": content, "image": image_data, "timestamp": now_str}
-    with open('posts1.json', 'a') as file:
+    with open('posts91.json', 'a') as file:
         file.write(json.dumps(post))
         file.write('\n')
 
