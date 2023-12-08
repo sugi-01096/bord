@@ -29,12 +29,12 @@ def save_post(content, image):
         image_data = base64.b64encode(image).decode('utf-8')
 
     post = {"content": content, "image": image_data, "timestamp": now_str}
-    with open('posts4.json', 'a') as file:
+    with open('posts10.json', 'a') as file:
         file.write(json.dumps(post))
         file.write('\n')
 
 def load_posts():
-    with open('posts4.json', 'r') as file:
+    with open('posts10.json', 'r') as file:
         lines = file.readlines()
         posts = [json.loads(line.strip()) for line in lines]
 
@@ -47,7 +47,7 @@ def load_posts():
         return posts
 
 def main():
-    st.title("雑談１")
+    st.title("poki")
 
     # 新規投稿の入力
     new_post_content = st.text_area("投稿", height=100)
